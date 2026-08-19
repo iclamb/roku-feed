@@ -10,7 +10,7 @@
 import { writeFile, mkdir } from "node:fs/promises";
 
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
-const DATABASE_ID = process.env.DATABASE_ID || "15246b43-db12-42b4-a5ca-db7ff9c22c44";
+const DATABASE_ID = process.env.DATABASE_ID || "3c1b06f0be6480eca39dec3cfe23c649";
 const NOTION_VERSION = "2022-06-28";
 
 if (!NOTION_TOKEN) {
