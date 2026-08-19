@@ -1,23 +1,22 @@
 name: Build Notion feed
 
 on:
-  # Refresh every 10 minutes (GitHub's minimum cron granularity is 5 min;
-  # scheduled runs can be delayed a few minutes under load — that's fine here).
+  # Refresh every 10 minutes (GitHub minimum cron granularity is 5 min)
   schedule:
     - cron: "*/10 * * * *"
+
   # Let you trigger a refresh by hand from the Actions tab.
   workflow_dispatch:
+
   # Rebuild whenever you push changes to the feed code.
   push:
     branches: [main]
 
-# Required so the workflow can publish to GitHub Pages.
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Don't let overlapping runs stomp on each other.
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -28,6 +27,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,11 +36,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: npm
+
+      # If you have a package-lock.json and dependencies
+      - name: Install deps
+        run: npm ci
 
       - name: Fetch Notion data
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          DATABASE_ID: ${{ vars.DATABASE_ID }}
+          # Use ONE of these depending on what you’re exporting:
+          NOTION_PAGE_ID: ${{ vars.NOTION_PAGE_ID }}
+          # NOTION_DATABASE_ID: ${{ vars.NOTION_DATABASE_ID }}
         run: node scripts/fetch-notion.mjs
 
       - name: Upload Pages artifact
